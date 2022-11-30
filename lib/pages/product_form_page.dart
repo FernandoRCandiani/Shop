@@ -7,17 +7,18 @@ class ProductFormPage extends StatefulWidget {
   const ProductFormPage({super.key});
 
   @override
-  State<ProductFormPage> createState() => _MyWidgetState();
+  State<ProductFormPage> createState() => _ProductFormPageState();
 }
 
-class _MyWidgetState extends State<ProductFormPage> {
+class _ProductFormPageState extends State<ProductFormPage> {
   final _priceFocus = FocusNode();
   final _descriptionFocus = FocusNode();
+
   final _imageUrlFocus = FocusNode();
   final _imageUrlController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
-  final _formData = Map();
+  final _formData = <String, Object>{};
 
   bool _isLoading = false;
 
@@ -33,23 +34,42 @@ class _MyWidgetState extends State<ProductFormPage> {
     return isValidUrl && endsWithFile;
   }
 
-  void _submitFrom() {
+  Future<void> _submitForm() async {
     final isValid = _formKey.currentState?.validate() ?? false;
 
     if (!isValid) {
       return;
     }
+
     _formKey.currentState?.save();
 
     setState(() => _isLoading = true);
 
-    Provider.of<ProductList>(
-      context,
-      listen: false,
-    ).saveProduct(_formData).then((value) {
-      setState(() => _isLoading = false);
+    try {
+      await Provider.of<ProductList>(
+        context,
+        listen: false,
+      ).saveProduct(_formData);
+
       Navigator.of(context).pop();
-    });
+    } catch (error) {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Ocorreu um erro!'),
+          content: Text('Ocorreu um erro para salvar o produto.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Ok'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+      // Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -94,7 +114,7 @@ class _MyWidgetState extends State<ProductFormPage> {
         title: Text('Formulário de Produto'),
         actions: [
           IconButton(
-            onPressed: _submitFrom,
+            onPressed: _submitForm,
             icon: Icon(Icons.save),
           ),
         ],
@@ -186,7 +206,7 @@ class _MyWidgetState extends State<ProductFormPage> {
                             textInputAction: TextInputAction.done,
                             focusNode: _imageUrlFocus,
                             controller: _imageUrlController,
-                            onFieldSubmitted: (_) => _submitFrom(),
+                            onFieldSubmitted: (_) => _submitForm(),
                             onSaved: (imageUrl) =>
                                 _formData['imageUrl'] = imageUrl ?? '',
                             validator: (_imageUrl) {
