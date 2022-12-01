@@ -4,8 +4,7 @@ import 'package:shop/components/app_drawer.dart';
 import 'package:shop/components/order.dart';
 import 'package:shop/models/order_list.dart';
 
-class _OrdersPageState extends StatelessWidget {
-
+class OrdersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
