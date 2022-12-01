@@ -5,9 +5,7 @@ import 'package:shop/models/cart.dart';
 import 'package:shop/models/order_list.dart';
 
 class CartPage extends StatelessWidget {
-  const CartPage({
-    Key? key,
-  }) : super(key: key);
+  const CartPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,29 +39,14 @@ class CartPage extends StatelessWidget {
                   Chip(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     label: Text(
-                      'R\$ ${cart.totalAmount.toStringAsFixed(2)}',
+                      'R\$${cart.totalAmount.toStringAsFixed(2)}',
                       style: TextStyle(
-                        color:
-                            Theme.of(context).primaryTextTheme.headline6?.color,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                   Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      Provider.of<OrderList>(
-                        context,
-                        listen: false,
-                      ).addOrder(cart);
-
-                      cart.clear();
-                    },
-                    child: Text('COMPRAR'),
-                    style: TextButton.styleFrom(
-                        textStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    )),
-                  ),
+                  CartButton(cart: cart),
                 ],
               ),
             ),
@@ -77,5 +60,43 @@ class CartPage extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class CartButton extends StatefulWidget {
+  const CartButton({
+    Key? key,
+    required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  State<CartButton> createState() => _CartButtonState();
+}
+
+class _CartButtonState extends State<CartButton> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return _isLoading
+        ? CircularProgressIndicator()
+        : TextButton(
+            onPressed: widget.cart.itemsCount == 0
+                ? null
+                : () async {
+                    setState(() => _isLoading = true);
+
+                    await Provider.of<OrderList>(
+                      context,
+                      listen: false,
+                    ).addOrder(widget.cart);
+
+                    widget.cart.clear();
+                    setState(() => _isLoading = false);
+                  },
+            child: Text('COMPRAR'),
+          );
   }
 }
