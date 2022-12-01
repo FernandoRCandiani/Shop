@@ -40,6 +40,11 @@ class MyApp extends StatelessWidget {
                 primary: Colors.purple,
                 secondary: Colors.deepOrange,
               ),
+          textTheme: ThemeData().textTheme.copyWith(
+            headline6: TextStyle(
+              color: Colors.white,
+            )
+          ),
           fontFamily: 'Lato',
         ),
         // home: ProductsOverviewPage(),
