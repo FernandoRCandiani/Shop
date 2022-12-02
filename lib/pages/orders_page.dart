@@ -13,8 +13,8 @@ class OrdersPage extends StatelessWidget {
       ),
       drawer: AppDrawer(),
       body: FutureBuilder(
-        future: Provider.of(context, listen: false).loadOrders(),
-        builder: (ctx, snapshot) {
+        future: Provider.of<OrderList>(context, listen: false).loadOrders(),
+        builder: ((ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.error != null) {
@@ -29,7 +29,7 @@ class OrdersPage extends StatelessWidget {
               ),
             );
           }
-        },
+        }),
       ),
     );
   }
